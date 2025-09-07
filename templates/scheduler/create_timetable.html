@@ -1,0 +1,291 @@
+{% extends 'scheduler/college-base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Timetable - Smart Scheduler{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Page Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <h1 class="h3 mb-2">
+                        <i class="bi bi-calendar-plus text-primary"></i>
+                        Create New Timetable
+                    </h1>
+                    <p class="text-muted">
+                        Generate optimized timetables with intelligent scheduling algorithms
+                    </p>
+                </div>
+            </div>
+
+            <!-- Timetable Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> Timetable Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="timetableForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">
+                                    Timetable Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.name }}
+                                <div class="form-text">Give a descriptive name for this timetable</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.academic_year.id_for_label }}" class="form-label">
+                                    Academic Year <span class="text-danger">*</span>
+                                </label>
+                                {{ form.academic_year }}
+                                <div class="form-text">e.g., 2023-24</div>
+                            </div>
+                        </div>
+
+                        <!-- Department and Semester -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="{{ form.department.id_for_label }}" class="form-label">
+                                    Department <span class="text-danger">*</span>
+                                </label>
+                                {{ form.department }}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.semester.id_for_label }}" class="form-label">
+                                    Semester <span class="text-danger">*</span>
+                                </label>
+                                {{ form.semester }}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="{{ form.max_classes_per_day.id_for_label }}" class="form-label">
+                                    Max Classes/Day <span class="text-danger">*</span>
+                                </label>
+                                {{ form.max_classes_per_day }}
+                            </div>
+                        </div>
+
+                        <!-- Batches Selection -->
+                        <div class="mb-4">
+                            <label for="{{ form.batches.id_for_label }}" class="form-label">
+                                Select Batches <span class="text-danger">*</span>
+                            </label>
+                            {{ form.batches }}
+                            <div class="form-text">
+                                Hold Ctrl/Cmd to select multiple batches. Batches will be filtered based on department and semester selection.
+                            </div>
+                        </div>
+
+                        <!-- Optimization Parameters -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="bi bi-sliders"></i> Optimization Parameters
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="optimize_faculty" checked>
+                                            <label class="form-check-label" for="optimize_faculty">
+                                                Optimize Faculty Workload
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="optimize_rooms" checked>
+                                            <label class="form-check-label" for="optimize_rooms">
+                                                Maximize Room Utilization
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="avoid_conflicts" checked>
+                                            <label class="form-check-label" for="avoid_conflicts">
+                                                Minimize Conflicts
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                            
+                            <div>
+                                <button type="button" class="btn btn-outline-primary" id="previewBtn">
+                                    <i class="bi bi-eye"></i> Preview Parameters
+                                </button>
+                                <button type="submit" class="btn btn-primary" id="generateBtn">
+                                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                    <i class="bi bi-lightning"></i> Generate Timetable
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Parameter Preview Modal -->
+            <div class="modal fade" id="previewModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-eye"></i> Timetable Parameters Preview
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" id="previewContent">
+                            <!-- Content will be loaded here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Department-Batch filtering
+document.getElementById('{{ form.department.id_for_label }}').addEventListener('change', function() {
+    const departmentId = this.value;
+    const semester = document.getElementById('{{ form.semester.id_for_label }}').value;
+    
+    if (departmentId && semester) {
+        updateBatches(departmentId, semester);
+    }
+});
+
+document.getElementById('{{ form.semester.id_for_label }}').addEventListener('change', function() {
+    const semester = this.value;
+    const departmentId = document.getElementById('{{ form.department.id_for_label }}').value;
+    
+    if (departmentId && semester) {
+        updateBatches(departmentId, semester);
+    }
+});
+
+function updateBatches(departmentId, semester) {
+    fetch(`{% url 'get_department_batches' %}?department_id=${departmentId}&semester=${semester}`)
+        .then(response => response.json())
+        .then(data => {
+            const batchesSelect = document.getElementById('{{ form.batches.id_for_label }}');
+            batchesSelect.innerHTML = '';
+            
+            data.batches.forEach(batch => {
+                const option = document.createElement('option');
+                option.value = batch.id;
+                option.textContent = `${batch.name} - Semester ${batch.semester}`;
+                batchesSelect.appendChild(option);
+            });
+            
+            // Show message if no batches found
+            if (data.batches.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = 'No batches found for selected criteria';
+                option.disabled = true;
+                batchesSelect.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching batches:', error);
+        });
+}
+
+// Preview functionality
+document.getElementById('previewBtn').addEventListener('click', function() {
+    const formData = new FormData(document.getElementById('timetableForm'));
+    
+    let previewHTML = `
+        <div class="row g-3">
+            <div class="col-md-6">
+                <h6>Basic Information</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Name:</strong> ${formData.get('name') || 'Not specified'}</li>
+                    <li><strong>Academic Year:</strong> ${formData.get('academic_year') || 'Not specified'}</li>
+                    <li><strong>Department:</strong> ${document.getElementById('{{ form.department.id_for_label }}').selectedOptions[0]?.text || 'Not selected'}</li>
+                    <li><strong>Semester:</strong> ${formData.get('semester') || 'Not specified'}</li>
+                    <li><strong>Max Classes/Day:</strong> ${formData.get('max_classes_per_day') || 'Not specified'}</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Selected Batches</h6>
+                <ul class="list-unstyled">
+    `;
+    
+    const selectedBatches = document.getElementById('{{ form.batches.id_for_label }}').selectedOptions;
+    if (selectedBatches.length > 0) {
+        Array.from(selectedBatches).forEach(option => {
+            previewHTML += `<li><i class="bi bi-check-circle text-success"></i> ${option.text}</li>`;
+        });
+    } else {
+        previewHTML += '<li class="text-muted">No batches selected</li>';
+    }
+    
+    previewHTML += `
+                </ul>
+            </div>
+        </div>
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i>
+            <strong>Note:</strong> The system will automatically optimize the timetable based on faculty availability, 
+            room capacity, and scheduling constraints.
+        </div>
+    `;
+    
+    document.getElementById('previewContent').innerHTML = previewHTML;
+    new bootstrap.Modal(document.getElementById('previewModal')).show();
+});
+
+// Form submission with loading state
+document.getElementById('timetableForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('generateBtn');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    const icon = submitBtn.querySelector('.bi-lightning');
+    
+    // Show loading state
+    spinner.classList.remove('d-none');
+    icon.classList.add('d-none');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+});
+
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}
