@@ -1,0 +1,31 @@
+{% extends 'scheduler/college-base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Classroom - Smart Scheduler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body">
+                <h2 class="text-center mb-3">
+                    <i class="bi bi-door-closed text-primary"></i> Add Classroom
+                </h2>
+                <p class="text-muted text-center">Register a classroom with number, type, and capacity.</p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save Classroom
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

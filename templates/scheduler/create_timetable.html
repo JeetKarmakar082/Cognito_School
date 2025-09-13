@@ -1,0 +1,140 @@
+{% extends 'scheduler/college-base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Timetable Entry - Smart Scheduler{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Page Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <h1 class="h3 mb-2">
+                        <i class="bi bi-calendar-plus text-primary"></i>
+                        Create Timetable Entry
+                    </h1>
+                    <p class="text-muted">
+                        Add a new class entry with subject, faculty, classroom, and batch assignment
+                    </p>
+                </div>
+            </div>
+
+            <!-- Timetable Entry Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> Timetable Entry Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="timetableEntryForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Template & Time Slot -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.template.id_for_label }}" class="form-label">
+                                    Timetable Template <span class="text-danger">*</span>
+                                </label>
+                                {{ form.template }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.time_slot.id_for_label }}" class="form-label">
+                                    Time Slot <span class="text-danger">*</span>
+                                </label>
+                                {{ form.time_slot }}
+                            </div>
+                        </div>
+
+                        <!-- Classroom & Subject -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.classroom.id_for_label }}" class="form-label">
+                                    Classroom <span class="text-danger">*</span>
+                                </label>
+                                {{ form.classroom }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">
+                                    Subject <span class="text-danger">*</span>
+                                </label>
+                                {{ form.subject }}
+                            </div>
+                        </div>
+
+                        <!-- Faculty & Batch -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.faculty.id_for_label }}" class="form-label">
+                                    Faculty <span class="text-danger">*</span>
+                                </label>
+                                {{ form.faculty }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.batch.id_for_label }}" class="form-label">
+                                    Batch <span class="text-danger">*</span>
+                                </label>
+                                {{ form.batch }}
+                            </div>
+                        </div>
+
+                        <!-- Fixed Class Checkbox -->
+                        <div class="form-check mb-4">
+                            {{ form.is_fixed }}
+                            <label for="{{ form.is_fixed.id_for_label }}" class="form-check-label">
+                                Mark as Fixed Class
+                            </label>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                            
+                            <button type="submit" class="btn btn-primary" id="generateBtn"> <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span> <i class="bi bi-lightning"></i> Generate Timetable </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form submission with loading state
+document.getElementById('timetableEntryForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('saveBtn');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    const icon = submitBtn.querySelector('.bi-save');
+    
+    // Show loading state
+    spinner.classList.remove('d-none');
+    icon.classList.add('d-none');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+});
+
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.forEach.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

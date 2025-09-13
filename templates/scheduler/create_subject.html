@@ -1,0 +1,40 @@
+{% extends 'scheduler/college-base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Subject - Smart Scheduler{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Subject Form -->
+            <div class="card shadow-sm">
+            
+                <div class="card-body">
+                    <h2 class="text-center mb-3">
+                    <i class="bi bi-person-badge text-primary"></i>Add Subject
+                </h2>
+                <p class="text-muted text-center">Add a new subject with details like code, credits, and semester
+                    </p>
+        
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Subject
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

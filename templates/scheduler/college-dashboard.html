@@ -1,0 +1,668 @@
+{% extends 'scheduler/college-base.html' %}
+{% load static %}
+
+{% block title %}Academic Dashboard - Government College of Engineering{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Academic Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-banner bg-gradient-primary text-white rounded-4 p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="user-avatar-large me-3">
+                                <i class="bi bi-person-circle fs-1"></i>
+                            </div>
+                            <div>
+                                <h2 class="mb-1">Welcome back, {{ user.get_full_name|default:user.username }}!</h2>
+                                <p class="mb-0 opacity-90">
+                                    {% if user.is_superuser %}
+                                        System Administrator | Full Access
+                                    {% elif user.is_staff %}
+                                        Administrative Staff | Management Access
+                                    {% else %}
+                                        Faculty Member | Teaching Access
+                                    {% endif %}
+                                </p>
+                                <small class="opacity-75">
+                                    Last login: {{ user.last_login|date:"l, F j, Y \a\t g:i A" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <a href="{% url 'create_timetable' %}" class="btn btn-warning btn-sm me-2">
+                                <i class="bi bi-plus-circle me-1"></i>New Timetable
+                            </a>
+                            <a href="{% url 'manage_resources' %}" class="btn btn-outline-light btn-sm me-2">
+                                <i class="bi bi-gear me-1"></i>Manage Resources
+                            </a>
+                            <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#helpModal">
+                                <i class="bi bi-question-circle me-1"></i>Help
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="current-semester-info bg-white bg-opacity-20 rounded-3 p-3" style="color:black;">
+                            <p class="mb-2" style="color:black;">Current Academic Session</p>
+                            <p class="mb-1"><strong>2024-25 | Semester 1</strong></p>
+                            <small>Session ends in 45 days</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Statistics -->
+    <div class="academic-stats">
+        <div class="row align-items-center mb-3">
+            <div class="col">
+                <h3 class="mb-0">
+                    <i class="bi bi-graph-up-arrow me-2 text-primary"></i>
+                    Academic Overview
+                </h3>
+                <p class="text-muted mb-0">Real-time statistics and performance metrics</p>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="timeframe" id="weekly" checked>
+                    <label class="btn btn-outline-primary btn-sm" for="weekly">Week</label>
+                    
+                    <input type="radio" class="btn-check" name="timeframe" id="monthly">
+                    <label class="btn btn-outline-primary btn-sm" for="monthly">Month</label>
+                    
+                    <input type="radio" class="btn-check" name="timeframe" id="semester">
+                    <label class="btn btn-outline-primary btn-sm" for="semester">Semester</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid" style="justify-content: center; margin-bottom: 30px; margin-top: 20px; text-align: center;">
+            <div class="stat-item" style="width:auto; text-align: center;justify-content: center; display: inline-block; margin-right: 40px; margin-left: 40px;">
+                <div class="stat-icon mb-3">
+                    <i class="bi bi-building text-primary fs-2"></i>
+                </div>
+                <div class="stat-number">{{ stats.total_departments }}</div>
+                <div class="stat-label">Academic Departments</div>
+                <div class="stat-change positive mt-2">
+                    <i class="bi bi-arrow-up"></i> 2 new this year
+                </div>
+            </div>
+            
+            <div class="stat-item" style="width:auto; text-align: center;justify-content: center; display: inline-block; margin-right: 40px; margin-left: 40px;">
+                <div class="stat-icon mb-3">
+                    <i class="bi bi-door-open text-success fs-2"></i>
+                </div>
+                <div class="stat-number">{{ stats.total_classrooms }}</div>
+                <div class="stat-label">Smart Classrooms</div>
+                <div class="stat-change positive mt-2">
+                    <i class="bi bi-arrow-up"></i> 85% utilization
+                </div>
+            </div>
+            
+            <div class="stat-item" style="width:auto; text-align: center;justify-content: center; display: inline-block; margin-right: 40px; margin-left: 40px;">
+                <div class="stat-icon mb-3">
+                    <i class="bi bi-people text-info fs-2"></i>
+                </div>
+                <div class="stat-number">{{ stats.total_faculties }}</div>
+                <div class="stat-label">Faculty Members</div>
+                <div class="stat-change mt-2">
+                    <i class="bi bi-dash"></i> 92% attendance
+                </div>
+            </div>
+            
+            <div class="stat-item" style="width:auto; text-align: center;justify-content: center; display: inline-block; margin-right: 40px; margin-left: 40px;">
+                <div class="stat-icon mb-3">
+                    <i class="bi bi-journal-text text-warning fs-2"></i>
+                </div>
+                <div class="stat-number">{{ stats.total_subjects }}</div>
+                <div class="stat-label">Course Subjects</div>
+                <div class="stat-change positive mt-2">
+                    <i class="bi bi-arrow-up"></i> 15 updated
+                </div>
+            </div>
+            
+            <div class="stat-item" style="width:auto; text-align: center;justify-content: center; display: inline-block; margin-right: 40px; margin-left: 40px;">
+                <div class="stat-icon mb-3">
+                    <i class="bi bi-people-fill text-purple fs-2"></i>
+                </div>
+                <div class="stat-number">{{ stats.total_batches }}</div>
+                <div class="stat-label">Student Batches</div>
+                <div class="stat-change mt-2">
+                    <i class="bi bi-dash"></i> 1,247 students
+                </div>
+            </div>
+            
+            <div class="stat-item" style="width:auto; text-align: center;justify-content: center; display: inline-block; margin-right: 40px; margin-left: 40px;">
+                <div class="stat-icon mb-3">
+                    <i class="bi bi-calendar-check text-success fs-2"></i>
+                </div>
+                <div class="stat-number">{{ stats.active_timetables }}</div>
+                <div class="stat-label">Active Timetables</div>
+                <div class="stat-change positive mt-2">
+                    <i class="bi bi-check-circle"></i> All approved
+                </div>
+            </div>
+        </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Recent Timetables -->
+        {% comment %} <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1">
+                        <i class="bi bi-calendar-week me-2"></i>Recent Timetables
+                    </h4>
+                    <p class="text-muted mb-0">Latest scheduling activities and updates</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-funnel me-1"></i>Filter
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">All Departments</a></li>
+                        <li><a class="dropdown-item" href="#">Computer Science</a></li>
+                        <li><a class="dropdown-item" href="#">Electrical Engineering</a></li>
+                        <li><a class="dropdown-item" href="#">Mechanical Engineering</a></li>
+                    </ul>
+                </div>
+            </div> {% endcomment %}
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+        <h4 class="mb-1">
+            <i class="bi bi-calendar-week me-2"></i>All Timetables
+        </h4>
+        <p class="text-muted mb-0">Detailed schedule entries from the system</p>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-funnel me-1"></i>Filter
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">All Departments</a></li>
+            <li><a class="dropdown-item" href="#">Computer Science</a></li>
+            <li><a class="dropdown-item" href="#">Electrical Engineering</a></li>
+            <li><a class="dropdown-item" href="#">Mechanical Engineering</a></li>
+        </ul>
+    </div>
+</div>
+
+            {% if recent_timetables %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                {% comment %} <th>Timetable Details</th>
+                                <th>Department</th>
+                                <th>Academic Info</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Actions</th> {% endcomment %}
+                                <th>Day & Period</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Room</th>
+                    <th>Department</th>
+                    <th>Batch</th>
+                    <th>Academic Info</th>
+                    <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% comment %} {% for timetable in recent_timetables %}
+                            <tr class="fade-in">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="timetable-icon me-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle p-2">
+                                                <i class="bi bi-calendar-event text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">{{ timetable.name }}</h6>
+                                            <small class="text-muted">
+                                                Created {{ timetable.created_at|timesince }} ago
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="department-badge">
+                                        <span class="badge bg-light text-dark">{{ timetable.department.code }}</span>
+                                        <div class="mt-1">
+                                            <small>{{ timetable.department.name }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ timetable.academic_year }}</strong>
+                                        <div class="mt-1">
+                                            <small class="text-muted">Semester {{ timetable.semester }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if timetable.is_approved %}
+                                        <span class="badge bg-success-subtle text-success">
+                                            <i class="bi bi-check-circle me-1"></i>Approved
+                                        </span>
+                                        {% if timetable.approved_by %}
+                                            <div class="mt-1">
+                                                <small class="text-muted">by {{ timetable.approved_by.get_full_name }}</small>
+                                            </div>
+                                        {% endif %}
+                                    {% elif timetable.is_active %}
+                                        <span class="badge bg-warning-subtle text-warning">
+                                            <i class="bi bi-clock me-1"></i>Pending Review
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary">
+                                            <i class="bi bi-pencil me-1"></i>Draft
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="progress mb-1" style="height: 6px;">
+                                        <div class="progress-bar bg-success" 
+                                             style="width: {% if timetable.is_approved %}100{% elif timetable.is_active %}75{% else %}25{% endif %}%"></div>
+                                    </div>
+                                    <small class="text-muted">
+                                        {% if timetable.is_approved %}Complete{% elif timetable.is_active %}Review{% else %}Draft{% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'view_timetable' timetable.id %}" 
+                                           class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'export_timetable' timetable.id %}" 
+                                           class="btn btn-outline-success" title="Export">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" 
+                                                    data-bs-toggle="dropdown" title="More Options">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">
+                                                    <i class="bi bi-pencil me-2"></i>Edit
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#">
+                                                    <i class="bi bi-files me-2"></i>Duplicate
+                                                </a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#">
+                                                    <i class="bi bi-trash me-2"></i>Delete
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr> 
+                            {% endfor %}
+                            {% endcomment %}
+                            {% for entry in recent_timetables %}
+                            <tr class="fade-in">
+    <td>
+        <div class="d-flex align-items-center">
+            <div class="timetable-icon me-3">
+                <div class="bg-primary bg-opacity-10 rounded-circle p-2">
+                    <i class="bi bi-calendar-event text-primary"></i>
+                </div>
+            </div>
+            <div>
+                <h6 class="mb-1">{{ entry.time_slot }}</h6>
+                {% comment %} <small class="text-muted">Template: {{ entry.template.name }}</small> {% endcomment %}
+            </div>
+        </div>
+    </td>
+    <td>{{ entry.subject.name }}</td>
+    <td>{{ entry.faculty.employee_name }}</td>
+    <td>{{ entry.classroom }}</td>
+    <td>
+        <span class="badge bg-light text-dark">{{ entry.batch.department.code }}</span>
+        <div class="mt-1">
+            <small>{{ entry.batch.department.name }}</small>
+        </div>
+    </td>
+    <td>{{ entry.batch }}</td>
+    <td>
+        <strong>{{ entry.batch.academic_year }}</strong>
+        <div class="mt-1">
+            <small class="text-muted">Semester {{ entry.batch.semester }}</small>
+        </div>
+    </td>
+    <td>
+        <div class="btn-group btn-group-sm">
+            <a href="{% url 'view_timetable' entry.id %}" class="btn btn-outline-primary" title="View Details">
+                <i class="bi bi-eye"></i>
+            </a>
+            <a href="{% url 'export_timetable' entry.id %}" class="btn btn-outline-success" title="Export">
+                <i class="bi bi-download"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+                {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            {% else %}
+                <div class="empty-state text-center py-5">
+                    <div class="empty-icon mb-3">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-muted mb-3">No Timetables Found</h4>
+                    <p class="text-muted mb-4">Get started by creating your first timetable for the current semester.</p>
+                    <div class="empty-actions">
+                        <a href="{% url 'create_timetable' %}" class="btn btn-primary me-2">
+                            <i class="bi bi-plus-circle me-1"></i>Create New Timetable
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="bi bi-book me-1"></i>View Guide
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Quick Actions -->
+            <div class="sidebar-section mb-4">
+                <h5 class="sidebar-title mb-3">
+                    <i class="bi bi-lightning me-2"></i>Quick Actions
+                </h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'create_timetable' %}" class="btn btn-primary">
+                        <i class="bi bi-calendar-plus me-1"></i>New Timetable
+                    </a>
+                    <a href="{% url 'manage_resources' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-gear-wide me-1"></i>Manage Resources
+                    </a>
+                    <a href="/admin/" class="btn btn-outline-info">
+                        <i class="bi bi-shield-check me-1"></i>System Admin
+                    </a>
+                    <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reportModal">
+                        <i class="bi bi-file-bar-graph me-1"></i>Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- System Status -->
+             <div class="sidebar-section mb-4">
+                <h5 class="sidebar-title mb-3">
+                    <i class="bi bi-activity me-2"></i>System Status
+                </h5>
+                <div class="status-indicators">
+                    <div class="status-item d-flex justify-content-between align-items-center mb-3 border border-dark border-primary rounded-pill px-3 bg-info" style="margin-inline: 300px;">
+                        <span class="status-label">Database</span>
+                        <span class="badge bg-success-subtle text-success">
+                            <i class="bi bi-check-circle me-1"></i>Online
+                        </span>
+                    </div>
+                    <div class="status-item d-flex justify-content-between align-items-center mb-3  border border-dark border-primary rounded-pill px-3 bg-success" style="margin-inline: 300px;">
+                        <span class="status-label">Scheduler Engine</span>
+                        <span class="badge bg-success-subtle text-success">
+                            <i class="bi bi-check-circle me-1"></i>Active
+                        </span>
+                    </div>
+                    <div class="status-item d-flex justify-content-between align-items-center mb-3  border border-dark border-primary rounded-pill px-3 bg-primary" style="margin-inline: 300px;">
+                        <span class="status-label">Last Backup</span>
+                        <span class="badge bg-info-subtle text-info">
+                            <i class="bi bi-clock me-1"></i>2h ago
+                        </span>
+                    </div>
+                    <div class="status-item d-flex justify-content-between align-items-center  border border-dark border-primary rounded-pill px-3 bg-warning" style="margin-inline: 300px;">
+                        <span class="status-label">Storage Usage</span>
+                        <span class="badge bg-warning-subtle text-warning">
+                            <i class="bi bi-hdd me-1"></i>68%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="sidebar-section">
+                <h5 class="sidebar-title mb-3">
+                    <i class="bi bi-clock-history me-2"></i>Recent Activity
+                </h5>
+                <div class="activity-feed" style="display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 25px;">
+                    <div class="activity-item d-flex mb-3">
+                        <div class="activity-icon me-3">
+                            <i class="bi bi-plus-circle text-success"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-1"><strong>New timetable created</strong></p>
+                            <small class="text-muted">CS Dept - Semester 3</small>
+                            <div class="activity-time mt-1">
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item d-flex mb-3">
+                        <div class="activity-icon me-3">
+                            <i class="bi bi-check-circle text-primary"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-1"><strong>Timetable approved</strong></p>
+                            <small class="text-muted">EE Dept - Semester 5</small>
+                            <div class="activity-time mt-1">
+                                <small class="text-muted">4 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item d-flex">
+                        <div class="activity-icon me-3">
+                            <i class="bi bi-people text-info"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="mb-1"><strong>Faculty updated</strong></p>
+                            <small class="text-muted">3 new members added</small>
+                            <div class="activity-time mt-1">
+                                <small class="text-muted">Yesterday</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-question-circle me-2"></i>Help & Support
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Quick Start Guide</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bi bi-1-circle-fill text-primary me-2"></i>
+                                Set up departments and classrooms
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-2-circle-fill text-primary me-2"></i>
+                                Add faculty members and subjects
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-3-circle-fill text-primary me-2"></i>
+                                Create student batches
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-4-circle-fill text-primary me-2"></i>
+                                Generate optimized timetables
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Support Resources</h6>
+                        <div class="d-grid gap-2">
+                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-book me-1"></i>User Manual
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-play-circle me-1"></i>Video Tutorials
+                            </a>
+                            <a href="#" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-headset me-1"></i>Contact Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Generation Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Generate Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select">
+                            <option>Timetable Utilization</option>
+                            <option>Faculty Workload</option>
+                            <option>Classroom Usage</option>
+                            <option>Department Summary</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date Range</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="bi bi-download me-1"></i>Generate
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
+}
+
+.stat-change.positive {
+    color: var(--accent-green);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--academic-light);
+    padding-bottom: 0.5rem;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--academic-light);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-indicators .status-item {
+    padding: 0.5rem;
+    background: var(--academic-light);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+}
+
+.timetable-icon .bg-primary {
+    background-color: rgba(30, 58, 138, 0.1) !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stats on load
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        let currentValue = 0;
+        const increment = finalValue / 50;
+        
+        const timer = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= finalValue) {
+                stat.textContent = finalValue;
+                clearInterval(timer);
+            } else {
+                stat.textContent = Math.floor(currentValue);
+            }
+        }, 30);
+    });
+    
+    // Refresh activity feed every 30 seconds
+    setInterval(() => {
+        // In a real app, this would make an AJAX call to refresh activities
+        console.log('Refreshing activity feed...');
+    }, 30000);
+});
+</script>
+{% endblock %}

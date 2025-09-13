@@ -1,0 +1,507 @@
+{% extends 'scheduler/college-base.html' %}
+{% load static %}
+
+{% block title %}Manage Resources - Smart Scheduler{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Manage Resources</h1>
+                    <p class="text-muted mb-0">Configure departments, classrooms, faculty, subjects, and batches</p>
+                </div>
+                <div>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs nav-fill mb-4" id="resourceTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="departments-tab" data-bs-toggle="tab" 
+                            data-bs-target="#departments" type="button" role="tab">
+                        <i class="bi bi-building"></i> Departments
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="classrooms-tab" data-bs-toggle="tab" 
+                            data-bs-target="#classrooms" type="button" role="tab">
+                        <i class="bi bi-door-open"></i> Classrooms
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" 
+                            data-bs-target="#faculty" type="button" role="tab">
+                        <i class="bi bi-people"></i> Faculty
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="subjects-tab" data-bs-toggle="tab" 
+                            data-bs-target="#subjects" type="button" role="tab">
+                        <i class="bi bi-book"></i> Subjects
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="batches-tab" data-bs-toggle="tab" 
+                            data-bs-target="#batches" type="button" role="tab">
+                        <i class="bi bi-collection"></i> Batches
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="timeslots-tab" data-bs-toggle="tab" 
+                            data-bs-target="#timeslots" type="button" role="tab">
+                        <i class="bi bi-clock"></i> Time Slots
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="resourceTabContent">
+        <!-- Departments Tab -->
+        <div class="tab-pane fade show active" id="departments" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-building"></i> Departments</h5>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                            <a href="{% url 'create_department' %}" class="bi bi-plus" style="text-decoration: none; color: black;">Add Department</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if departments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for department in departments %}
+                                    <tr>
+                                        <td><strong>{{ department.name }}</strong></td>
+                                        <td><span class="badge bg-secondary">{{ department.code }}</span></td>
+                                        <td>{{ department.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Edit">
+                                                    <a href="/admin/scheduler/department/{{department.id}}/change" style="color: inherit;" class="bi bi-pencil"></a>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Delete">
+                                                    <a href="/admin/scheduler/department/{{department.id}}/delete" style="color: inherit;" class="bi bi-trash"></a>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-2 text-muted">No Departments Found</h5>
+                            <p class="text-muted">Add your first department to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Classrooms Tab -->
+        <div class="tab-pane fade" id="classrooms" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-door-open"></i> Classrooms</h5>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addClassroomModal">
+                            <a href="{% url 'create_classroom' %}" class="bi bi-plus" style="text-decoration: none; color: black;">Add Classroom</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if classrooms %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Capacity</th>
+                                        <th>Type</th>
+                                        <th>Department</th>
+                                        <th>Features</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for classroom in classrooms %}
+                                    <tr>
+                                        <td><strong>{{ classroom.name }}</strong></td>
+                                        <td>{{ classroom.capacity }}</td>
+                                        <td><span class="badge bg-info">{{ classroom.get_room_type_display }}</span></td>
+                                        <td>{{ classroom.department.name|default:"Unassigned" }}</td>
+                                        <td>
+                                            {% if classroom.has_projector %}<i class="bi bi-projector text-primary" title="Projector"></i>{% endif %}
+                                            {% if classroom.has_ac %}<i class="bi bi-snow text-info" title="AC"></i>{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if classroom.is_available %}
+                                                <span class="badge bg-success">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Edit">
+                                                    <a href="/admin/scheduler/classroom/{{classroom.id}}/change" style="color: inherit;" class="bi bi-pencil"></a>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Delete">
+                                                    <a href="/admin/scheduler/classroom/{{classroom.id}}/delete" style="color: inherit;" class="bi bi-trash"></a>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-door-open text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-2 text-muted">No Classrooms Found</h5>
+                            <p class="text-muted">Add your first classroom to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Tab -->
+        <div class="tab-pane fade" id="faculty" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-people"></i> Faculty Members</h5>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addFacultyModal">
+                            <a href="{% url 'create_faculty' %}" class="bi bi-plus" style="text-decoration: none; color: black;">Add Faculty</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if faculties %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Employee ID</th>
+                                        <th>Department</th>
+                                        <th>Max Hours/Day</th>
+                                        <th>Max Hours/Week</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for faculty in faculties %}
+                                    <tr>
+                                        <td><strong>{{ faculty.employee_name }}</strong></td>
+                                        <td><span class="badge bg-secondary">{{ faculty.employee_id }}</span></td>
+                                        <td>{{ faculty.department.name }}</td>
+                                        <td>{{ faculty.max_hours_per_day }}</td>
+                                        <td>{{ faculty.max_hours_per_week }}</td>
+                                        <td>
+                                            {% if faculty.is_available %}
+                                                <span class="badge bg-success">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Edit">
+                                                    <a href="/admin/scheduler/faculty/{{faculty.id}}/change" style="color: inherit;" class="bi bi-pencil"></a>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Delete">
+                                                    <a href="/admin/scheduler/faculty/{{faculty.id}}/delete" style="color: inherit;" class="bi bi-trash"></a>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-2 text-muted">No Faculty Members Found</h5>
+                            <p class="text-muted">Add your first faculty member to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects Tab -->
+        <div class="tab-pane fade" id="subjects" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-book"></i> Subjects</h5>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                            <a href="{% url 'create_subject' %}" class="bi bi-plus" style="text-decoration: none; color: black;">Add Subject</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if subjects %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Credits</th>
+                                        <th>Type</th>
+                                        <th>Department</th>
+                                        <th>Semester</th>
+                                        <th>Hours/Week</th>
+                                        <th>Lab Required</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in subjects %}
+                                    <tr>
+                                        <td><strong>{{ subject.name }}</strong></td>
+                                        <td><span class="badge bg-primary">{{ subject.code }}</span></td>
+                                        <td>{{ subject.credits }}</td>
+                                        <td><span class="badge bg-secondary">{{ subject.get_subject_type_display }}</span></td>
+                                        <td>{{ subject.department.name }}</td>
+                                        <td>{{ subject.semester }}</td>
+                                        <td>{{ subject.hours_per_week }}</td>
+                                        <td>
+                                            {% if subject.requires_lab %}
+                                                <i class="bi bi-check-circle text-success"></i>
+                                            {% else %}
+                                                <i class="bi bi-x-circle text-muted"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Edit">
+                                                    <a href="/admin/scheduler/subject/{{subject.id}}/change" style="color: inherit;" class="bi bi-pencil"></a>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Delete">
+                                                    <a href="/admin/scheduler/subject/{{subject.id}}/delete" style="color: inherit;" class="bi bi-trash"></a>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-book text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-2 text-muted">No Subjects Found</h5>
+                            <p class="text-muted">Add your first subject to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Batches Tab -->
+        <div class="tab-pane fade" id="batches" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-collection"></i> Student Batches</h5>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addBatchModal">
+                            <a href="{% url 'create_batch' %}" class="bi bi-plus" style="text-decoration: none; color: black;">Add Batch</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if batches %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Program</th>
+                                        <th>Department</th>
+                                        <th>Semester</th>
+                                        <th>Year</th>
+                                        <th>Students</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for batch in batches %}
+                                    <tr>
+                                        <td><strong>{{ batch.name }}</strong></td>
+                                        <td><span class="badge bg-info">{{ batch.get_program_display }}</span></td>
+                                        <td>{{ batch.department.name }}</td>
+                                        <td>{{ batch.semester }}</td>
+                                        <td>{{ batch.year }}</td>
+                                        <td>{{ batch.student_count }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Edit">
+                                                    <a href="/admin/scheduler/batch/{{batch.id}}/change" style="color: inherit;" class="bi bi-pencil"></a>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Delete">
+                                                    <a href="/admin/scheduler/batch/{{batch.id}}/delete" style="color: inherit;" class="bi bi-trash"></a>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-collection text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-2 text-muted">No Batches Found</h5>
+                            <p class="text-muted">Add your first batch to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Slots Tab -->
+        <div class="tab-pane fade" id="timeslots" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-clock"></i> Time Slots</h5>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addTimeSlotModal">
+                            <a href="{% url 'create_timeslot' %}" class="bi bi-plus" style="text-decoration: none; color: black;">Add Time Slot</a>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if time_slots %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Duration</th>
+                                        <th>Type</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slot in time_slots %}
+                                    <tr>
+                                        <td><strong>{{ slot.get_day_display }}</strong></td>
+                                        <td>{{ slot.start_time|time:"H:i" }}</td>
+                                        <td>{{ slot.end_time|time:"H:i" }}</td>
+                                        <td>{{ slot.start_time }} - {{ slot.end_time }}</td>
+                                        <td>
+                                            {% if slot.is_break %}
+                                                <span class="badge bg-warning">Break</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Class</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Edit">
+                                                    <a href="/admin/scheduler/timeslot/{{slot.id}}/change" style="color: inherit;" class="bi bi-pencil"></a>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Delete">
+                                                    <a href="/admin/scheduler/timeslot/{{slot.id}}/delete" style="color: inherit;" class="bi bi-trash"></a>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-clock text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-2 text-muted">No Time Slots Found</h5>
+                            <p class="text-muted">Add your first time slot to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Floating Button -->
+<div class="position-fixed bottom-0 end-0 p-3">
+    <div class="dropdown dropup">
+        <button class="btn btn-primary btn-lg rounded-circle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                <i class="bi bi-building"></i> Add Department
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addClassroomModal">
+                <i class="bi bi-door-open"></i> Add Classroom
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addFacultyModal">
+                <i class="bi bi-people"></i> Add Faculty
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                <i class="bi bi-book"></i> Add Subject
+            </a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Auto-focus search when tab is shown
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(tab) {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            const searchInput = e.target.getAttribute('data-bs-target') + ' input[type="search"]';
+            const input = document.querySelector(searchInput);
+            if (input) {
+                input.focus();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

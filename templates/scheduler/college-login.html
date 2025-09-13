@@ -1,0 +1,551 @@
+{% extends 'scheduler/college-base.html' %}
+{% load static %}
+
+{% block title %}Faculty Portal Login - Government College of Engineering{% endblock %}
+
+{% block extra_css %}
+<style>
+
+:root {
+    --primary-blue: #1e3a8a;        /* Deep blue */
+    --primary-light: #3b82f6;       /* Light blue */
+    --gradient-primary: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    --secondary-gold: #facc15;      /* Golden yellow */
+    --academic-navy: #1e293b;       /* Navy text */
+    --text-muted: #6b7280;
+    --text-secondary: #4b5563;
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 2rem 0;
+}
+
+.login-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    max-width: 1000px;
+    width: 100%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.login-info {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.login-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="rgba(255,255,255,0.05)" fill-opacity="1"><circle cx="30" cy="30" r="2"/></g></svg>');
+    opacity: 0.3;
+}
+
+.login-info-content {
+    position: relative;
+    z-index: 2;
+}
+
+.college-emblem {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.login-form-container {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-form {
+    max-width: 320px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    height: 50px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    padding-left: 3rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 3;
+}
+
+.btn-login {
+    height: 50px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    background: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+}
+
+.login-features {
+    margin-top: 2rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.feature-icon {
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.security-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #ecfdf5;
+    color: #059669;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.forgot-password {
+    text-decoration: none;
+    color: var(--primary-blue);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    color: var(--primary-light);
+}
+
+@media (max-width: 768px) {
+    .login-wrapper {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 1rem;
+    }
+    
+    .login-info {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .login-form-container {
+        padding: 2rem;
+    }
+}
+
+.system-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.status-indicator {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.academic-year-banner {
+    background: var(--secondary-gold);
+    color: var(--academic-navy);
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Academic Year Banner -->
+<div class="academic-year-banner">
+    <i class="bi bi-calendar-event me-2"></i>
+    Academic Year 2024-25 | Faculty Login Portal
+</div>
+
+<!-- System Status -->
+<div class="system-status">
+    <div class="status-indicator">
+        <div class="status-dot"></div>
+        System Online
+    </div>
+</div>
+
+<div class="login-container">
+    <div class="login-wrapper">
+        <!-- College Information Side -->
+        <div class="login-info">
+            <div class="login-info-content">
+                <div class="college-emblem">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                
+                <h2 class="mb-3" style="color:white;">Faculty Portal</h2>
+                <p class="mb-4 opacity-90">
+                    Access the Smart Timetable Management System for 
+                    Government College of Engineering & Technology
+                </p>
+                
+                <div class="login-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <span>Intelligent Timetable Generation</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <span>Resource Optimization</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <span>Secure Academic Data</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <span>Multi-Department Support</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4" style="border-top: 1px solid rgba(255,255,255,0.2);">
+                    <small class="opacity-75">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Part of NEP 2020 Digital Education Initiative
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Login Form Side -->
+        <div class="login-form-container">
+            <div class="text-center mb-4">
+                <h3 class="mb-2 text-primary">Welcome Back</h3>
+                <p class="text-muted">Please sign in to your account</p>
+                
+                <div class="security-badge">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Secure Login Portal
+                </div>
+            </div>
+            
+            <form method="post" class="login-form needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="id_username" class="form-label text-secondary fw-semibold">
+                        Faculty ID / Username
+                    </label>
+                    <div class="input-group">
+                        <span class="input-icon">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="id_username" 
+                               name="username"
+                               placeholder="Enter your faculty ID"
+                               required
+                               autocomplete="username">
+                        <div class="invalid-feedback">
+                            Please provide a valid username.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="id_password" class="form-label text-secondary fw-semibold">
+                        Password
+                    </label>
+                    <div class="input-group">
+                        <span class="input-icon">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input type="password" 
+                               class="form-control" 
+                               id="id_password" 
+                               name="password"
+                               placeholder="Enter your password"
+                               required
+                               autocomplete="current-password">
+                        <div class="invalid-feedback">
+                            Please provide a valid password.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Remember Me & Forgot Password -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label text-secondary" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <!-- Login Button -->
+                <button type="submit" class="btn btn-primary btn-login w-100">
+                    {% comment %} <i class="bi bi-box-arrow-in-right me-2"></i> {% endcomment %}
+                    Sign In
+                </button>
+                
+                <!-- Error Messages -->
+                {% if form.errors %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                {{ error }}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
+            
+            <!-- Sign Up -->
+            <div class="login-footer">
+                <div class="mb-3">
+                    <large class="text-muted">
+                        {% comment %} <i class="bi bi-clock me-1"></i> {% endcomment %}
+                        Don't have an account ? Create one
+                    </large>
+                </div>
+                
+                <div class="support-links">
+                    <large>
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        <a href="{% url 'signup' %}" class="text-decoration-none">Signup</a>
+                    </large>
+                </div>
+
+               {% comment %} 
+               <div class="mt-3 pt-3" style="border-top: 1px solid #e2e8f0;">
+                    <large class="text-muted">
+                        <i class="bi bi-building me-1"></i>
+                        Cognito School
+                    </large>
+                </div> 
+                {% endcomment %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Demo Credentials Modal (Remove in production) -->
+<div class="position-fixed bottom-0 start-0 m-3" style="z-index: 1000;">
+    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#demoModal">
+        <i class="bi bi-info-circle me-1"></i>Demo Info
+    </button>
+</div>
+
+<div class="modal fade" id="demoModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h6 class="modal-title">Demo Credentials</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2"><strong>For Testing:</strong></p>
+                <div class="bg-light p-2 rounded mb-2">
+                    <small>
+                        <strong>Username:</strong> admin<br>
+                        <strong>Password:</strong> [your-password]
+                    </small>
+                </div>
+                <small class="text-muted">
+                    Use the superuser credentials you created during setup.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced form validation
+    const form = document.querySelector('.needs-validation');
+    const inputs = form.querySelectorAll('input[required]');
+    
+    // Real-time validation
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                validateField(this);
+            }
+        });
+    });
+    
+    function validateField(field) {
+        if (field.checkValidity()) {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+        } else {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+        }
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        form.classList.add('was-validated');
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (form.checkValidity()) {
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing In...';
+            submitBtn.disabled = true;
+        }
+    });
+    
+    // Auto-fill demo credentials
+    document.getElementById('demoModal').addEventListener('shown.bs.modal', function() {
+        const usernameField = document.getElementById('id_username');
+        const passwordField = document.getElementById('id_password');
+        
+        // Add click handlers to auto-fill
+        this.addEventListener('click', function(e) {
+            if (e.target.closest('.bg-light')) {
+                usernameField.value = 'admin';
+                usernameField.focus();
+                bootstrap.Modal.getInstance(this).hide();
+            }
+        });
+    });
+    
+    // Add floating label effect
+    inputs.forEach(input => {
+        if (input.value) {
+            input.parentElement.classList.add('has-value');
+        }
+        
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('has-focus');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('has-focus');
+            if (this.value) {
+                this.parentElement.classList.add('has-value');
+            } else {
+                this.parentElement.classList.remove('has-value');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
